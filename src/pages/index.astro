@@ -1,0 +1,522 @@
+---
+import { getCollection } from 'astro:content';
+import { sortWorks } from '../lib/works';
+import Base from '../layouts/Base.astro';
+import WorkCard from '../components/WorkCard.astro';
+
+const allWorks = (await getCollection('works', ({ data }) => !data.draft)).sort(sortWorks);
+const FEATURED = 3; // トップに表示する件数。残りは /works で一覧表示
+const works = allWorks.slice(0, FEATURED);
+
+const sections = [
+  { id: 'about', no: '01', label: 'About' },
+  { id: 'works', no: '02', label: 'Works' },
+  { id: 'skills', no: '03', label: 'Skills' },
+  { id: 'ai', no: '04', label: 'Improve' },
+  { id: 'career', no: '05', label: 'Career' },
+];
+
+// FVの線（viewBox 0–100）。各ノードの座標を水平に通過する
+const heroNodes = [
+  { x: 12, y: 64, ja: '設計' },
+  { x: 31, y: 36, ja: '実装' },
+  { x: 50, y: 60, ja: '構築' },
+  { x: 69, y: 30, ja: '公開' },
+  { x: 88, y: 52, ja: '運用' },
+];
+const heroPath =
+  'M -5 74 C 2 74, 6 64, 12 64 S 24 36, 31 36 S 43 60, 50 60 S 62 30, 69 30 S 81 52, 88 52 S 100 40, 105 36';
+
+const aboutStats = [
+  { label: 'Web制作の経験', prefix: '', value: 5, unit: '年以上' },
+  { label: '年間の担当案件', prefix: '約', value: 20, unit: '件' },
+];
+
+
+const flow = [
+  { en: 'Design', ja: '設計', text: '要件と運用を見据えて、ページ構成・CMSの持ち方を設計する。' },
+  { en: 'Frontend', ja: '実装', text: 'HTML / CSS / JavaScript でのコーディングとアニメーション実装。' },
+  { en: 'CMS', ja: '構築', text: 'WordPress（PHP）や Astro で、更新しやすい管理画面をつくる。' },
+  { en: 'Launch', ja: '公開', text: 'マニュアル作成、クライアントへの説明、公開対応まで。' },
+  { en: 'Operate', ja: '保守運用', text: '公開後の更新・改善を継続し、サイトを育てていく。' },
+];
+
+const aiUses = [
+  'コーディング補助（HTML / CSS / JavaScript、PHP の実装、バグの原因調査）',
+  'コードレビュー・リファクタリング（アクセシビリティ改善、alt属性、最新の書き方への置き換え）',
+  'WordPress操作マニュアルの自動作成',
+  '運用作業の自動化',
+  'トレンド調査・情報収集',
+];
+
+// type: 'band' は割合（帯の長さ）、'blocks' は時間（1ブロック = 1時間）
+const aiResults = [
+  {
+    label: 'コーディングの工数',
+    headline: '半分に',
+    note: '約50%削減',
+    type: 'band',
+    ratio: 50,
+    beforeText: '100%',
+    afterText: '約50%',
+  },
+  {
+    label: 'WordPress関連の工数',
+    headline: '10分の1に',
+    note: '約90%削減',
+    type: 'band',
+    ratio: 10,
+    beforeText: '100%',
+    afterText: '約10%',
+  },
+  {
+    label: 'WordPress操作マニュアルの作成',
+    headline: '1時間に',
+    note: '4〜5時間かかっていた作業',
+    type: 'blocks',
+    ratio: 0,
+    beforeText: '4〜5時間',
+    afterText: '1時間',
+  },
+  {
+    label: '運用作業',
+    headline: '1時間以内に',
+    note: '4〜5時間かかっていた作業を自動化',
+    type: 'blocks',
+    ratio: 0,
+    beforeText: '4〜5時間',
+    afterText: '1時間以内',
+  },
+];
+
+const career = [
+  {
+    period: '2025.04 —',
+    title: 'サブリーダー',
+    org: '株式会社ユニオンネット',
+    text: '10名のチームで、スケジュール管理と後輩2名の育成を担当。',
+  },
+  {
+    period: '2023.01 —',
+    title: 'AIを活用した業務効率化',
+    org: '株式会社ユニオンネット',
+    text: '生成AIを制作業務に導入。個人での活用からチームへの展開、勉強会での共有まで。',
+  },
+  {
+    period: '2021.05 —',
+    title: 'Webエンジニア',
+    org: '株式会社ユニオンネット',
+    text: 'コーポレートサイトを中心に年間約20案件を担当。設計・フロントエンド実装・WordPress構築・保守運用まで一貫して対応。',
+  },
+  {
+    period: '2020.04 — 2021.02',
+    title: '社内IT（ICT部署）',
+    org: '株式会社ICSパートナーズ',
+    text: '社内サーバーの保守管理、約100台のPCを含むIT資産管理、会計システムの不具合・問い合わせ対応。',
+  },
+];
+
+// months: 経験期間（月）。線の長さになる。note は年数の代わりに表示する補足
+const skillGroups: { group: string; items: { name: string; months?: number; note?: string }[] }[] = [
+  {
+    group: 'Language',
+    items: [
+      { name: 'HTML / CSS / JavaScript', months: 66 },
+      { name: 'PHP', months: 66 },
+      { name: 'TypeScript / SCSS', note: '案件で使用' },
+    ],
+  },
+  {
+    group: 'CMS / Framework',
+    items: [
+      { name: 'WordPress', months: 66 },
+      { name: 'Astro', months: 44 },
+    ],
+  },
+  {
+    group: 'Workflow',
+    items: [
+      { name: 'Git', months: 66 },
+      { name: 'Bitbucket / Sourcetree', months: 66 },
+      { name: 'Vercel', months: 44 },
+    ],
+  },
+  {
+    group: 'Design',
+    items: [
+      { name: 'Figma', months: 46 },
+      { name: 'Adobe XD', months: 20, note: '2022年12月まで' },
+      { name: 'Photoshop / Illustrator', note: '基本操作' },
+    ],
+  },
+  {
+    group: 'AI',
+    items: [
+      { name: 'ChatGPT', months: 46 },
+      { name: 'GitHub Copilot', months: 29 },
+      { name: 'Grok', months: 10 },
+      { name: 'Claude / Claude Code', months: 7 },
+    ],
+  },
+];
+const maxMonths = 66;
+const fmtMonths = (m: number) => {
+  const y = Math.floor(m / 12);
+  const r = m % 12;
+  return `${y ? `${y}年` : ''}${r ? `${r}か月` : ''}`;
+};
+---
+
+<Base
+  title="福田 祥広 | Web Engineer Portfolio"
+  description="Webエンジニア 福田祥広のポートフォリオ。設計から保守運用まで一貫して担うWeb制作と、AIを活用した業務改善。"
+>
+  <a class="skip" href="#main">本文へスキップ</a>
+
+  <nav class="rail" aria-label="セクション">
+    <a class="rail__home" href="#top">YF</a>
+    <div class="rail__track" aria-hidden="true"><span class="rail__fill" data-progress></span></div>
+    <ol class="rail__list">
+      {
+        sections.map((s) => (
+          <li>
+            <a href={`#${s.id}`} data-rail={s.id}>
+              <span class="rail__no">{s.no}</span>
+              <span class="rail__label">{s.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <main id="main">
+    <!-- Hero -->
+    <header class="hero" id="top">
+      <p class="hero__eyebrow">Portfolio — Web Engineer / Osaka</p>
+
+      <!-- 一本の線：設計から運用までを通る -->
+      <div class="hero__art" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          {[-14, -7, 7, 14].map((y) => <path class="hero__ghost" d={heroPath} transform={`translate(0 ${y})`} />)}
+        </svg>
+        <svg class="hero__draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path class="hero__stroke" d={heroPath} data-hero-path></path>
+        </svg>
+        {
+          heroNodes.map((n, i) => (
+            <span class:list={['hero__node', n.y < 45 && 'is-above']} style={`left:${n.x}%;top:${n.y}%;--i:${i}`}>
+              <span class="hero__node-no">0{i + 1}</span>
+              <span class="hero__node-ja">{n.ja}</span>
+            </span>
+          ))
+        }
+        <span class="hero__runner" data-hero-runner></span>
+      </div>
+
+      <div class="hero__foot">
+        <h1 class="hero__name">
+          <span class="hero__name-ja">福田 祥広</span>
+          <span class="hero__name-en">Yoshihiro Fukuda</span>
+        </h1>
+        <p class="hero__lead">設計から運用まで、一本の線でつなぐ。</p>
+      </div>
+    </header>
+
+    <!-- About -->
+    <section class="section" id="about" data-section>
+      <div class="section__head reveal">
+        <p class="section__no">01 — About</p>
+        <h2 class="section__title">最後までやり切る。<br />仕組みで、良くする。</h2>
+      </div>
+      <div class="about">
+        <div class="about__text reveal">
+          <p>
+            2021年よりWeb制作会社のエンジニアとして、コーポレートサイトをはじめとするWebサイト制作に携わっています。フロントエンド実装、WordPress構築、Astroによる静的サイト構築、公開後の保守運用まで、一貫して担当してきました。
+          </p>
+          <p>
+            強みは、複数の案件を並行しながら最後までやり切る推進力と、仕組みによって業務そのものを良くしていく改善力です。現在は10名のチームでサブリーダーを務め、個人の成果だけでなくチーム全体が円滑に動くことを意識して取り組んでいます。
+          </p>
+        </div>
+        <ol class="strengths">
+          <li class="reveal">
+            <span class="strengths__no">A</span>
+            <h3>一貫して担う対応力</h3>
+            <p>企画・設計から保守運用まで。在籍5年超、年間約20案件。</p>
+          </li>
+          <li class="reveal">
+            <span class="strengths__no">B</span>
+            <h3>チームを前に進める力</h3>
+            <p>10名チームのサブリーダーとして、スケジュール管理と後輩育成。</p>
+          </li>
+          <li class="reveal">
+            <span class="strengths__no">C</span>
+            <h3>AIによる業務改善</h3>
+            <p>生成AIを制作フローに組み込み、工数削減と品質向上を推進。</p>
+          </li>
+        </ol>
+      </div>
+
+      <ul class="stats">
+        {
+          aboutStats.map((n) => (
+            <li class="reveal">
+              <p class="stats__label">{n.label}</p>
+              <p class="stats__value">
+                {n.prefix && <span class="stats__unit">{n.prefix}</span>}
+                <span data-count={n.value}>{n.value}</span>
+                <span class="stats__unit">{n.unit}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Works -->
+    <section class="section" id="works" data-section>
+      <div class="section__head reveal">
+        <p class="section__no">02 — Works</p>
+        <h2 class="section__title">実績</h2>
+        <p class="section__lead">直近の案件をご紹介します。</p>
+      </div>
+      <div class="works">
+        {works.map((work, i) => <WorkCard work={work} index={i} />)}
+        {works.length === 0 && <p class="works__empty">実績は準備中です。</p>}
+      </div>
+      {
+        allWorks.length > 0 && (
+          <p class="works__more reveal">
+            <a class="work__link" href="/works">
+              実績をすべて見る（{allWorks.length}件）<span aria-hidden="true"> →</span>
+            </a>
+          </p>
+        )
+      }
+    </section>
+
+    <!-- Skills -->
+    <section class="section" id="skills" data-section>
+      <div class="section__head reveal">
+        <p class="section__no">03 — Skills</p>
+        <h2 class="section__title">スキル</h2>
+        <p class="section__lead">
+          設計から保守運用まで、工程を分けずに一貫して担当できます。線の長さは経験年数です。
+        </p>
+      </div>
+
+      <h3 class="subhead reveal">対応範囲</h3>
+      <ol class="flow">
+        {
+          flow.map((f, i) => (
+            <li class="reveal" style={`--i:${i}`}>
+              <span class="flow__dot" aria-hidden="true" />
+              <p class="flow__en">{f.en}</p>
+              <h3 class="flow__ja">{f.ja}</h3>
+              <p class="flow__text">{f.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <h3 class="subhead reveal">使用技術と経験年数</h3>
+      <div class="skillsets">
+        {
+          skillGroups.map((g) => (
+            <div class="skillset reveal">
+              <h4>{g.group}</h4>
+              <ul>
+                {g.items.map((it) => (
+                  <li>
+                    <span class="skillset__name">{it.name}</span>
+                    <span class="skillset__val">{it.months ? fmtMonths(it.months) + (it.note ? `（${it.note}）` : '') : it.note}</span>
+                    <span class="skillset__track">
+                      {it.months && <span class="skillset__fill" style={`--w:${(it.months / maxMonths) * 100}%`} />}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- AI -->
+    <section class="section section--ink" id="ai" data-section>
+      <div class="section__head reveal">
+        <p class="section__no">04 — Improve</p>
+        <h2 class="section__title">AIで、<br />仕事の線を短くする。</h2>
+        <p class="section__lead">
+          2023年から生成AIを制作業務に取り入れ、個人での活用からチームへの導入・展開、勉強会での共有までを進めています。
+        </p>
+      </div>
+      <p class="legend reveal" aria-hidden="true">
+        <span class="legend__before">導入前</span>
+        <span class="legend__after">導入後</span>
+      </p>
+      <ul class="results">
+        {
+          aiResults.map((r) => (
+            <li class="result reveal">
+              <p class="result__label">{r.label}</p>
+              <p class="result__headline">{r.headline}</p>
+              <p class="result__note">{r.note}</p>
+              <div class="result__rows">
+                <div class="result__row">
+                  <span class="result__when">導入前</span>
+                  <span class="result__track">
+                    {r.type === 'band' ? (
+                      <span class="bar bar--before" />
+                    ) : (
+                      [0, 1, 2, 3, 4].map((i) => <span class:list={['blk', i === 4 && 'blk--maybe']} />)
+                    )}
+                  </span>
+                  <span class="result__val">{r.beforeText}</span>
+                </div>
+                <div class="result__row">
+                  <span class="result__when">導入後</span>
+                  <span class="result__track">
+                    {r.type === 'band' ? (
+                      <span class="bar bar--after" style={`--w:${r.ratio}%`} />
+                    ) : (
+                      <span class="blk blk--after" />
+                    )}
+                  </span>
+                  <span class="result__val result__val--after">{r.afterText}</span>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="ai__uses reveal">
+        <h3>活用していること</h3>
+        <ul>{aiUses.map((u) => <li>{u}</li>)}</ul>
+        <ul class="tags tags--ink">
+          <li>Claude / Claude Code</li>
+          <li>ChatGPT</li>
+          <li>GitHub Copilot</li>
+          <li>Grok</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Career -->
+    <section class="section" id="career" data-section>
+      <div class="section__head reveal">
+        <p class="section__no">05 — Career</p>
+        <h2 class="section__title">経歴</h2>
+      </div>
+      <ol class="career">
+        {
+          career.map((c) => (
+            <li class="reveal">
+              <p class="career__period">{c.period}</p>
+              <div>
+                <h3>{c.title}</h3>
+                <p class="career__org">{c.org}</p>
+                <p>{c.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="cert reveal"><span>資格</span>ITパスポート（2020年8月）</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="footer__copy">設計から運用まで、一本の線でつなぐ。</p>
+    <p class="footer__small">© {new Date().getFullYear()} Yoshihiro Fukuda</p>
+  </footer>
+
+  <script>
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // スクロールで表示
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add('is-in');
+          e.target.querySelectorAll<HTMLElement>('[data-count]').forEach(countUp);
+          io.unobserve(e.target);
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    );
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+    // 数字のカウントアップ
+    function countUp(el: HTMLElement) {
+      const to = Number(el.dataset.count);
+      if (reduce || !to) return;
+      const start = performance.now();
+      const dur = 900;
+      const tick = (now: number) => {
+        const p = Math.min((now - start) / dur, 1);
+        el.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    // FV：線の上を走る点
+    const heroPath = document.querySelector<SVGPathElement>('[data-hero-path]');
+    const runner = document.querySelector<HTMLElement>('[data-hero-runner]');
+    if (heroPath && runner && !reduce) {
+      const total = heroPath.getTotalLength();
+      const delay = 2800; // 線が描かれてから走り出す
+      const dur = 14000;
+      const t0 = performance.now();
+      const run = (now: number) => {
+        const t = now - t0 - delay;
+        if (t >= 0) {
+          const pt = heroPath.getPointAtLength(((t % dur) / dur) * total);
+          runner.style.left = `${pt.x}%`;
+          runner.style.top = `${pt.y}%`;
+          runner.classList.add('is-on');
+        }
+        requestAnimationFrame(run);
+      };
+      requestAnimationFrame(run);
+    }
+
+    // 進捗ライン
+    const fill = document.querySelector<HTMLElement>('[data-progress]');
+    let ticking = false;
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      fill?.style.setProperty('--p', String(max > 0 ? window.scrollY / max : 0));
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+
+    // 現在地
+    const links = new Map(
+      [...document.querySelectorAll<HTMLAnchorElement>('[data-rail]')].map((a) => [a.dataset.rail, a]),
+    );
+    const spy = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          links.forEach((a) => a.removeAttribute('aria-current'));
+          links.get(e.target.id)?.setAttribute('aria-current', 'true');
+        }
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    document.querySelectorAll('[data-section]').forEach((s) => spy.observe(s));
+  </script>
+</Base>

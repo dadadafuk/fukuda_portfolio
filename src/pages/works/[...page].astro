@@ -1,0 +1,97 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import type { GetStaticPaths } from 'astro';
+import { sortWorks } from '../../lib/works';
+import Base from '../../layouts/Base.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const works = (await getCollection('works', ({ data }) => !data.draft)).sort(sortWorks);
+  // pageSize: 1ページあたりの表示件数
+  return paginate(works, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+const works = page.data;
+const rendered = await Promise.all(works.map(async (w) => ({ work: w, Content: (await render(w)).Content })));
+
+const total = String(page.total).padStart(2, '0');
+const pageHref = (n: number) => (n === 1 ? '/works' : `/works/${n}`);
+const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
+const title = page.currentPage === 1 ? '実績一覧 | 福田 祥広' : `実績一覧（${page.currentPage}ページ目） | 福田 祥広`;
+---
+
+<Base
+  title={title}
+  description="Webエンジニア 福田祥広の実績一覧。担当した案件の一覧です。"
+>
+  <a class="skip" href="#main">本文へスキップ</a>
+
+  <main id="main" class="listpage">
+    <header class="listpage__head">
+      <a class="listpage__back" href="/#works"><span aria-hidden="true">← </span>トップへ戻る</a>
+      <p class="section__no">Works — {total} projects</p>
+      <h1 class="section__title">実績一覧</h1>
+      <p class="section__lead">担当した案件の一覧です。</p>
+    </header>
+
+    <ol class="worklist">
+      {
+        rendered.map(({ work, Content }, i) => {
+          const d = work.data;
+          return (
+            <li class="worklist__item">
+              <p class="worklist__no">{String(page.start + i + 1).padStart(2, '0')}</p>
+              {d.thumbnail && (
+                <div class="worklist__thumb">
+                  <Image src={d.thumbnail} alt={d.thumbnailAlt ?? ''} widths={[240, 480]} sizes="240px" />
+                </div>
+              )}
+              <div class="worklist__main">
+                <h2 class="worklist__title">
+                  {d.client && <span class="work__client">{d.client}</span>}
+                  {d.title}
+                </h2>
+                {d.category && <p class="worklist__cat">{d.category}</p>}
+                <div class="worklist__summary"><Content /></div>
+                {d.outcomes.length > 0 && (
+                  <ul class="worklist__outcomes">{d.outcomes.map((o) => <li>{o}</li>)}</ul>
+                )}
+                {d.stack.length > 0 && <ul class="tags">{d.stack.map((s) => <li>{s}</li>)}</ul>}
+                {d.url && (
+                  <a class="work__link" href={d.url} target="_blank" rel="noopener noreferrer">
+                    サイトを見る<span aria-hidden="true"> ↗</span>
+                  </a>
+                )}
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+    {
+      page.lastPage > 1 && (
+        <nav class="pager" aria-label="ページ送り">
+          {page.url.prev ? <a class="pager__link" href={pageHref(page.currentPage - 1)} rel="prev">← 前へ</a> : <span class="pager__link is-disabled" aria-hidden="true">← 前へ</span>}
+          <ol class="pager__list">
+            {pages.map((n) => (
+              <li>
+                {n === page.currentPage ? (
+                  <span class="pager__num is-current" aria-current="page">{n}</span>
+                ) : (
+                  <a class="pager__num" href={pageHref(n)}>{n}</a>
+                )}
+              </li>
+            ))}
+          </ol>
+          {page.url.next ? <a class="pager__link" href={pageHref(page.currentPage + 1)} rel="next">次へ →</a> : <span class="pager__link is-disabled" aria-hidden="true">次へ →</span>}
+        </nav>
+      )
+    }
+    {works.length === 0 && <p class="works__empty">実績は準備中です。</p>}
+  </main>
+
+  <footer class="footer">
+    <p class="footer__small">© {new Date().getFullYear()} Yoshihiro Fukuda</p>
+  </footer>
+</Base>

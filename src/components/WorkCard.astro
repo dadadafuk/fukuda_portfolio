@@ -1,0 +1,89 @@
+---
+import { Image } from 'astro:assets';
+import { render, type CollectionEntry } from 'astro:content';
+
+interface Props {
+  work: CollectionEntry<'works'>;
+  index: number;
+}
+const { work, index } = Astro.props;
+const d = work.data;
+const { Content } = await render(work);
+
+const no = String(index + 1).padStart(2, '0');
+---
+
+<article class="work reveal">
+  <div class="work__visual">
+    {
+      d.thumbnail ? (
+        <Image
+          src={d.thumbnail}
+          alt={d.thumbnailAlt ?? ''}
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 900px) 520px, 100vw"
+        />
+      ) : (
+        <div class="work__placeholder" aria-hidden="true">
+          <span class="work__placeholder-no">{no}</span>
+          <svg viewBox="0 0 400 250" preserveAspectRatio="none">
+            <path d="M0 170 C 80 90, 140 230, 220 140 S 330 60, 400 120" />
+          </svg>
+        </div>
+      )
+    }
+  </div>
+
+  <div class="work__body">
+    <p class="work__meta">
+      <span>{no}</span>
+      {d.category && <span>{d.category}</span>}
+    </p>
+    <h3 class="work__title">
+      {d.client && <span class="work__client">{d.client}</span>}
+      {d.title}
+    </h3>
+    <div class="work__summary"><Content /></div>
+
+    <dl class="work__spec">
+      {
+        (d.role || d.team) && (
+          <div>
+            <dt>役割</dt>
+            <dd>{[d.role, d.team].filter(Boolean).join(' ／ ')}</dd>
+          </div>
+        )
+      }
+      {
+        d.tasks.length > 0 && (
+          <div>
+            <dt>担当</dt>
+            <dd>
+              <ul>{d.tasks.map((t) => <li>{t}</li>)}</ul>
+            </dd>
+          </div>
+        )
+      }
+      {
+        d.outcomes.length > 0 && (
+          <div class="is-outcome">
+            <dt>成果</dt>
+            <dd>
+              <ul>{d.outcomes.map((t) => <li>{t}</li>)}</ul>
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    {d.stack.length > 0 && <ul class="tags">{d.stack.map((s) => <li>{s}</li>)}</ul>}
+
+    {
+      d.url && (
+        <a class="work__link" href={d.url} target="_blank" rel="noopener noreferrer">
+          サイトを見る<span aria-hidden="true"> ↗</span>
+        </a>
+      )
+    }
+  </div>
+</article>
