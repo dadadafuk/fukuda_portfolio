@@ -9,7 +9,8 @@ team: 4名体制
 stack:
   - HTML / CSS / JavaScript
 tasks:
-  - コーディング、アニメーションの実装
+  - コーディング
+  - アニメーションの企画・実装
 outcomes:
   - 参考サイトに掲載
 url: https://www.kobe-tech.ac.jp/illust/

@@ -21,6 +21,7 @@ const works = defineCollection({
       team: z.string().optional(), // 体制
       stack: z.array(z.string()).default([]), // 使用技術
       tasks: z.array(z.string()).default([]), // 担当業務
+      highlights: z.array(z.string()).default([]), // 工夫した点
       outcomes: z.array(z.string()).default([]), // 成果
       url: z.string().url().optional(), // 公開URL
       thumbnail: image().optional(), // サムネイル（このファイルからの相対パス）

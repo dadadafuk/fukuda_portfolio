@@ -54,6 +54,21 @@ const title = page.currentPage === 1 ? '実績一覧 | 福田 祥広' : `実績�
                 </h2>
                 {d.category && <p class="worklist__cat">{d.category}</p>}
                 <div class="worklist__summary"><Content /></div>
+                {(d.role || d.team) && (
+                  <p class="worklist__role">{[d.role, d.team].filter(Boolean).join(' ／ ')}</p>
+                )}
+                {d.tasks.length > 0 && (
+                  <dl class="worklist__block">
+                    <dt>担当</dt>
+                    <dd><ul>{d.tasks.map((t) => <li>{t}</li>)}</ul></dd>
+                  </dl>
+                )}
+                {d.highlights.length > 0 && (
+                  <dl class="worklist__block">
+                    <dt>工夫</dt>
+                    <dd><ul>{d.highlights.map((t) => <li>{t}</li>)}</ul></dd>
+                  </dl>
+                )}
                 {d.outcomes.length > 0 && (
                   <ul class="worklist__outcomes">{d.outcomes.map((o) => <li>{o}</li>)}</ul>
                 )}

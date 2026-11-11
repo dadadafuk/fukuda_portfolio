@@ -1010,6 +1010,24 @@ main,
 .worklist__summary {
   margin-top: 12px;
 }
+.worklist__role {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.worklist__block {
+  display: grid;
+  grid-template-columns: 3em 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+.worklist__block dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 2.2;
+  color: var(--ink-2);
+}
 .worklist__outcomes {
   margin-top: 12px;
   font-size: 14px;
@@ -1033,18 +1051,18 @@ main,
 }
 @media (min-width: 760px) {
   .worklist__item {
-    grid-template-columns: 56px 160px minmax(240px, 320px) minmax(0, 1fr);
+    grid-template-columns: 56px minmax(240px, 320px) minmax(0, 1fr);
     column-gap: 24px;
   }
   .worklist__thumb {
-    grid-column: 3;
+    grid-column: 2;
     grid-row: 1 / span 2;
     align-self: start;
     margin-top: 0;
     max-width: none;
   }
   .worklist__main {
-    grid-column: 4;
+    grid-column: 3;
     grid-row: 1 / span 2;
     margin-top: 0;
   }

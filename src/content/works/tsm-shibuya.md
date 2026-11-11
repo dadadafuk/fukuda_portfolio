@@ -14,7 +14,8 @@ stack:
   - PHP（WordPress）
   - Vercel
 tasks:
-  - コーディング、アニメーションの実装
+  - コーディング
+  - アニメーションの企画・実装
   - CMS構築（WordPressの管理画面設計、REST APIの設定）
   - AstroでのBuild、Vercelの設定、公開対応
 outcomes:

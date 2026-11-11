@@ -11,7 +11,8 @@ stack:
   - WordPress（PHP）
   - Claude Code
 tasks:
-  - コーディング、アニメーションの実装
+  - コーディング
+  - アニメーションの企画・実装
   - WordPress構築（クライアントが使いやすい管理画面を設計）
   - マニュアル作成、クライアントへの公開説明、公開対応
 outcomes:

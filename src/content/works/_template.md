@@ -13,6 +13,8 @@ stack:
   - WordPress（PHP）
 tasks:
   - 担当した業務を1行ずつ
+highlights:
+  - 特に工夫した点を1行ずつ
 outcomes:
   - 成果を1行ずつ
 # url: https://example.com
