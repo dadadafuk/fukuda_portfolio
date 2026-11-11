@@ -92,7 +92,7 @@ const aiResults = [
 const career = [
   {
     period: '2025.04 —',
-    title: 'サブリーダー',
+    title: '後輩育成・スケジュール管理',
     org: '株式会社ユニオンネット',
     text: '10名のチームで、スケジュール管理と後輩2名の育成を担当。',
   },
@@ -159,6 +159,7 @@ const skillGroups: { group: string; items: { name: string; months?: number; note
     ],
   },
 ];
+const businessTools = ['ChatWork', 'Backlog', 'Notion', 'Word / Excel'];
 const maxMonths = 66;
 const fmtMonths = (m: number) => {
   const y = Math.floor(m / 12);
@@ -174,9 +175,11 @@ const fmtMonths = (m: number) => {
   <a class="skip" href="#main">本文へスキップ</a>
 
   <nav class="rail" aria-label="セクション">
-    <a class="rail__home" href="#top">YF</a>
+    <a class="rail__home" href="#top">
+      <span aria-hidden="true">YF</span><span class="visually-hidden">ページの先頭へ</span>
+    </a>
     <div class="rail__track" aria-hidden="true"><span class="rail__fill" data-progress></span></div>
-    <ol class="rail__list">
+    <ol class="rail__list" lang="en">
       {
         sections.map((s) => (
           <li>
@@ -193,7 +196,10 @@ const fmtMonths = (m: number) => {
   <main id="main">
     <!-- Hero -->
     <header class="hero" id="top">
-      <p class="hero__eyebrow">Portfolio — Web Engineer / Osaka</p>
+      <div class="hero__top">
+        <p class="hero__eyebrow" lang="en">Portfolio — Web Engineer / Osaka</p>
+        <button class="hero__toggle" type="button" data-hero-toggle hidden>アニメーションを停止</button>
+      </div>
 
       <!-- 一本の線：設計から運用までを通る -->
       <div class="hero__art" aria-hidden="true">
@@ -217,7 +223,7 @@ const fmtMonths = (m: number) => {
       <div class="hero__foot">
         <h1 class="hero__name">
           <span class="hero__name-ja">福田 祥広</span>
-          <span class="hero__name-en">Yoshihiro Fukuda</span>
+          <span class="hero__name-en" lang="en">Yoshihiro Fukuda</span>
         </h1>
         <p class="hero__lead">設計から運用まで、一本の線でつなぐ。</p>
       </div>
@@ -226,7 +232,7 @@ const fmtMonths = (m: number) => {
     <!-- About -->
     <section class="section" id="about" data-section>
       <div class="section__head reveal">
-        <p class="section__no">01 — About</p>
+        <p class="section__no" lang="en">01 — About</p>
         <h2 class="section__title">最後までやり切る。<br />仕組みで、良くする。</h2>
       </div>
       <div class="about">
@@ -235,7 +241,7 @@ const fmtMonths = (m: number) => {
             2021年よりWeb制作会社のエンジニアとして、コーポレートサイトをはじめとするWebサイト制作に携わっています。フロントエンド実装、WordPress構築、Astroによる静的サイト構築、公開後の保守運用まで、一貫して担当してきました。
           </p>
           <p>
-            強みは、複数の案件を並行しながら最後までやり切る推進力と、仕組みによって業務そのものを良くしていく改善力です。現在は10名のチームでサブリーダーを務め、個人の成果だけでなくチーム全体が円滑に動くことを意識して取り組んでいます。
+            強みは、複数の案件を並行しながら最後までやり切る推進力と、仕組みによって業務そのものを良くしていく改善力です。現在は10名のチームで後輩育成とスケジュール管理を担い、個人の成果だけでなくチーム全体が円滑に動くことを意識して取り組んでいます。
           </p>
         </div>
         <ol class="strengths">
@@ -247,7 +253,7 @@ const fmtMonths = (m: number) => {
           <li class="reveal">
             <span class="strengths__no">B</span>
             <h3>チームを前に進める力</h3>
-            <p>10名チームのサブリーダーとして、スケジュール管理と後輩育成。</p>
+            <p>10名チームで、後輩育成とスケジュール管理。</p>
           </li>
           <li class="reveal">
             <span class="strengths__no">C</span>
@@ -276,7 +282,7 @@ const fmtMonths = (m: number) => {
     <!-- Works -->
     <section class="section" id="works" data-section>
       <div class="section__head reveal">
-        <p class="section__no">02 — Works</p>
+        <p class="section__no" lang="en">02 — Works</p>
         <h2 class="section__title">実績</h2>
         <p class="section__lead">直近の案件をご紹介します。</p>
       </div>
@@ -298,7 +304,7 @@ const fmtMonths = (m: number) => {
     <!-- Skills -->
     <section class="section" id="skills" data-section>
       <div class="section__head reveal">
-        <p class="section__no">03 — Skills</p>
+        <p class="section__no" lang="en">03 — Skills</p>
         <h2 class="section__title">スキル</h2>
         <p class="section__lead">
           設計から保守運用まで、工程を分けずに一貫して担当できます。線の長さは経験年数です。
@@ -311,8 +317,8 @@ const fmtMonths = (m: number) => {
           flow.map((f, i) => (
             <li class="reveal" style={`--i:${i}`}>
               <span class="flow__dot" aria-hidden="true" />
-              <p class="flow__en">{f.en}</p>
-              <h3 class="flow__ja">{f.ja}</h3>
+              <p class="flow__en" lang="en">{f.en}</p>
+              <h4 class="flow__ja">{f.ja}</h4>
               <p class="flow__text">{f.text}</p>
             </li>
           ))
@@ -324,7 +330,7 @@ const fmtMonths = (m: number) => {
         {
           skillGroups.map((g) => (
             <div class="skillset reveal">
-              <h4>{g.group}</h4>
+              <h4 lang="en">{g.group}</h4>
               <ul>
                 {g.items.map((it) => (
                   <li>
@@ -340,12 +346,19 @@ const fmtMonths = (m: number) => {
           ))
         }
       </div>
+
+      <div class="tools reveal">
+        <h4 lang="en">Business Tool</h4>
+        <ul>
+          {businessTools.map((t) => <li>{t}</li>)}
+        </ul>
+      </div>
     </section>
 
     <!-- AI -->
     <section class="section section--ink" id="ai" data-section>
       <div class="section__head reveal">
-        <p class="section__no">04 — Improve</p>
+        <p class="section__no" lang="en">04 — Improve</p>
         <h2 class="section__title">AIで、<br />仕事の線を短くする。</h2>
         <p class="section__lead">
           2023年から生成AIを制作業務に取り入れ、個人での活用からチームへの導入・展開、勉強会での共有までを進めています。
@@ -359,7 +372,7 @@ const fmtMonths = (m: number) => {
         {
           aiResults.map((r) => (
             <li class="result reveal">
-              <p class="result__label">{r.label}</p>
+              <h3 class="result__label">{r.label}</h3>
               <p class="result__headline">{r.headline}</p>
               <p class="result__note">{r.note}</p>
               <div class="result__rows">
@@ -405,7 +418,7 @@ const fmtMonths = (m: number) => {
     <!-- Career -->
     <section class="section" id="career" data-section>
       <div class="section__head reveal">
-        <p class="section__no">05 — Career</p>
+        <p class="section__no" lang="en">05 — Career</p>
         <h2 class="section__title">経歴</h2>
       </div>
       <ol class="career">
@@ -428,7 +441,7 @@ const fmtMonths = (m: number) => {
 
   <footer class="footer">
     <p class="footer__copy">設計から運用まで、一本の線でつなぐ。</p>
-    <p class="footer__small">© {new Date().getFullYear()} Yoshihiro Fukuda</p>
+    <p class="footer__small" lang="en">© {new Date().getFullYear()} Yoshihiro Fukuda</p>
   </footer>
 
   <script>
@@ -462,46 +475,77 @@ const fmtMonths = (m: number) => {
       requestAnimationFrame(tick);
     }
 
-    // FV：線の上を走る点
+    // FV：線の上を走る点（停止ボタン付き。画面外・タブ非表示のときは止める）
+    const hero = document.querySelector<HTMLElement>('.hero');
     const heroPath = document.querySelector<SVGPathElement>('[data-hero-path]');
     const runner = document.querySelector<HTMLElement>('[data-hero-runner]');
-    if (heroPath && runner && !reduce) {
+    const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]');
+    if (hero && heroPath && runner && !reduce) {
       const total = heroPath.getTotalLength();
-      const delay = 2800; // 線が描かれてから走り出す
       const dur = 14000;
-      const t0 = performance.now();
-      const run = (now: number) => {
-        const t = now - t0 - delay;
-        if (t >= 0) {
-          const pt = heroPath.getPointAtLength(((t % dur) / dur) * total);
+      let elapsed = -2800; // 線が描かれてから走り出す
+      let last = 0;
+      let raf = 0;
+      let playing = true;
+      let visible = true;
+
+      const frame = (now: number) => {
+        elapsed += now - last;
+        last = now;
+        if (elapsed >= 0) {
+          const pt = heroPath.getPointAtLength(((elapsed % dur) / dur) * total);
           runner.style.left = `${pt.x}%`;
           runner.style.top = `${pt.y}%`;
           runner.classList.add('is-on');
         }
-        requestAnimationFrame(run);
+        raf = requestAnimationFrame(frame);
       };
-      requestAnimationFrame(run);
+      const sync = () => {
+        cancelAnimationFrame(raf);
+        if (playing && visible && !document.hidden) {
+          last = performance.now();
+          raf = requestAnimationFrame(frame);
+        }
+      };
+
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        sync();
+      }).observe(hero);
+      document.addEventListener('visibilitychange', sync);
+
+      if (toggle) {
+        toggle.hidden = false;
+        toggle.addEventListener('click', () => {
+          playing = !playing;
+          toggle.textContent = playing ? 'アニメーションを停止' : 'アニメーションを再生';
+          sync();
+        });
+      }
+      sync();
     }
 
-    // 進捗ライン
-    const fill = document.querySelector<HTMLElement>('[data-progress]');
-    let ticking = false;
-    const update = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      fill?.style.setProperty('--p', String(max > 0 ? window.scrollY / max : 0));
-      ticking = false;
-    };
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      },
-      { passive: true },
-    );
-    update();
+    // 進捗ライン：CSS の scroll-driven animation に非対応のブラウザだけ JS で更新
+    if (!CSS.supports('animation-timeline: scroll()')) {
+      const fill = document.querySelector<HTMLElement>('[data-progress]');
+      let ticking = false;
+      const update = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        fill?.style.setProperty('--p', String(max > 0 ? window.scrollY / max : 0));
+        ticking = false;
+      };
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(update);
+          }
+        },
+        { passive: true },
+      );
+      update();
+    }
 
     // 現在地
     const links = new Map(
@@ -512,7 +556,7 @@ const fmtMonths = (m: number) => {
         for (const e of entries) {
           if (!e.isIntersecting) continue;
           links.forEach((a) => a.removeAttribute('aria-current'));
-          links.get(e.target.id)?.setAttribute('aria-current', 'true');
+          links.get(e.target.id)?.setAttribute('aria-current', 'location');
         }
       },
       { rootMargin: '-45% 0px -50% 0px' },

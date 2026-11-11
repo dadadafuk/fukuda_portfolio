@@ -9,7 +9,8 @@
   --ink: #1b1b19;
   --ink-2: #55534d;
   --line: #cfcabd;
-  --accent: #d6452b;
+  --accent: #d6452b; /* 線・図形用 */
+  --accent-text: #b8341c; /* 文字用（生成り地でコントラスト比 4.5:1 以上） */
 
   --serif: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   --sans: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
@@ -18,6 +19,15 @@
   --rail: 0px;
   --gutter: clamp(20px, 5vw, 72px);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+/* スクロール進捗（0〜1）。scroll-driven animation で動かすため型を登録 */
+@property --p {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
 }
 
 @media (min-width: 960px) {
@@ -33,8 +43,17 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  /* ページ間の遷移（対応ブラウザのみ） */
+  @view-transition {
+    navigation: auto;
+  }
 }
 
 body {
@@ -42,16 +61,31 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.9;
   font-feature-settings: 'palt';
   letter-spacing: 0.04em;
   -webkit-font-smoothing: antialiased;
+  line-break: strict;
+  overflow-wrap: break-word;
 }
 
 h1,
 h2,
 h3,
+h4 {
+  text-wrap: balance;
+}
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4,
 p,
 ul,
 ol,
@@ -92,6 +126,19 @@ img {
 }
 .skip:focus {
   top: 8px;
+}
+
+/* 見た目には出さず、読み上げにだけ伝える */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---------- Reveal ---------- */
@@ -147,7 +194,7 @@ img {
   .rail__home {
     display: block;
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 0.8125rem;
     letter-spacing: 0.1em;
     text-decoration: none;
   }
@@ -177,11 +224,11 @@ img {
   }
   .rail__no {
     display: block;
-    font-size: 11px;
+    font-size: 0.75rem;
   }
   .rail__label {
     display: block;
-    font-size: 10px;
+    font-size: 0.75rem;
     letter-spacing: 0.06em;
     opacity: 0;
     transform: translateX(-4px);
@@ -191,12 +238,25 @@ img {
   }
   .rail__list a:hover,
   .rail__list a[aria-current] {
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .rail__list a:hover .rail__label,
   .rail__list a[aria-current] .rail__label {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* スクロール量に連動（対応ブラウザは CSS のみ、非対応は JS で --p を更新） */
+@supports (animation-timeline: scroll()) {
+  .rail__fill {
+    animation: progress linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes progress {
+    to {
+      --p: 1;
+    }
   }
 }
 
@@ -219,10 +279,37 @@ main,
 .hero__eyebrow,
 .section__no {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-2);
+}
+
+.hero__top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+/* 動き続けるアニメーションの停止ボタン（WCAG 2.2.2） */
+.hero__toggle {
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 1px solid var(--ink-2);
+  border-radius: 99px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.hero__toggle:hover {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
 }
 
 .hero__art {
@@ -287,13 +374,13 @@ main,
 .hero__node-no {
   top: 26px;
   font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent);
+  font-size: 0.75rem;
+  color: var(--accent-text);
 }
 .hero__node-ja {
   top: 44px;
   font-family: var(--serif);
-  font-size: clamp(15px, 1.8vw, 24px);
+  font-size: clamp(0.9375rem, 1.8vw, 1.5rem);
   letter-spacing: 0.16em;
   text-indent: 0.16em;
 }
@@ -350,21 +437,21 @@ main,
 .hero__name-ja {
   display: block;
   font-family: var(--serif);
-  font-size: clamp(24px, 2.6vw, 34px);
+  font-size: clamp(1.5rem, 2.6vw, 2.125rem);
   letter-spacing: 0.16em;
   line-height: 1.5;
 }
 .hero__name-en {
   display: block;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.12em;
   color: var(--ink-2);
 }
 .hero__lead {
   font-family: var(--serif);
-  font-size: clamp(14px, 1.3vw, 17px);
+  font-size: clamp(0.875rem, 1.3vw, 1.0625rem);
   letter-spacing: 0.12em;
   color: var(--ink-2);
 }
@@ -381,7 +468,7 @@ main,
 .section__title {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: clamp(28px, 4.4vw, 56px);
+  font-size: clamp(1.75rem, 4.4vw, 3.5rem);
   line-height: 1.5;
   letter-spacing: 0.08em;
   margin-top: 20px;
@@ -426,16 +513,16 @@ main,
 .strengths__no {
   grid-row: span 2;
   font-family: var(--mono);
-  font-size: 13px;
-  color: var(--accent);
+  font-size: 0.8125rem;
+  color: var(--accent-text);
   padding-top: 4px;
 }
 .strengths h3 {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 700;
 }
 .strengths p {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ink-2);
 }
 @media (min-width: 960px) {
@@ -456,12 +543,12 @@ main,
   border-bottom: 1px solid var(--line);
 }
 .stats__label {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
 }
 .stats__value {
   font-family: var(--serif);
-  font-size: clamp(72px, 11vw, 150px);
+  font-size: clamp(4.5rem, 11vw, 9.375rem);
   line-height: 1.15;
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
@@ -518,18 +605,18 @@ main,
 }
 .flow__en {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.1em;
   color: var(--ink-2);
 }
 .flow__ja {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 26px;
+  font-size: 1.625rem;
   letter-spacing: 0.12em;
 }
 .flow__text {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ink-2);
   margin-top: 6px;
   max-width: 30em;
@@ -601,7 +688,7 @@ main,
   left: 20px;
   top: 8px;
   font-family: var(--serif);
-  font-size: clamp(56px, 8vw, 96px);
+  font-size: clamp(3.5rem, 8vw, 6rem);
   line-height: 1.2;
   color: var(--line);
 }
@@ -610,17 +697,17 @@ main,
   flex-wrap: wrap;
   gap: 4px 20px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   color: var(--ink-2);
 }
 .work__meta span:first-child {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .work__title {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: clamp(22px, 2.4vw, 30px);
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
   line-height: 1.6;
   letter-spacing: 0.06em;
   margin-top: 10px;
@@ -628,17 +715,17 @@ main,
 .work__client {
   display: block;
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ink-2);
 }
 .work__summary {
   margin-top: 14px;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .work__spec {
   margin-top: 24px;
   border-top: 1px solid var(--line);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .work__spec > div {
   display: grid;
@@ -649,7 +736,7 @@ main,
 }
 .work__spec dt {
   font-weight: 700;
-  font-size: 12px;
+  font-size: 0.75rem;
   padding-top: 2px;
 }
 .work__spec li {
@@ -666,12 +753,12 @@ main,
   background: currentColor;
 }
 .work__spec .is-outcome dt {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .work__link {
   display: inline-block;
   margin-top: 20px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
   border-bottom: 1px solid var(--ink);
@@ -680,7 +767,7 @@ main,
     border-color 0.3s;
 }
 .work__link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   border-color: var(--accent);
 }
 @media (min-width: 900px) {
@@ -702,7 +789,7 @@ main,
 }
 .tags li {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   line-height: 1.4;
   padding: 5px 10px;
@@ -717,7 +804,7 @@ main,
 .legend {
   display: flex;
   gap: 24px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #b9b5aa;
   margin-bottom: 28px;
 }
@@ -746,17 +833,17 @@ main,
   }
 }
 .result__label {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
 }
 .result__headline {
   font-family: var(--serif);
-  font-size: clamp(40px, 5.4vw, 72px);
+  font-size: clamp(2.5rem, 5.4vw, 4.5rem);
   line-height: 1.35;
   letter-spacing: 0.04em;
 }
 .result__note {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #e8836f;
 }
 .result__rows {
@@ -772,12 +859,12 @@ main,
 }
 .result__when,
 .result__val {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #b9b5aa;
   white-space: nowrap;
 }
 .result__val--after {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--paper);
 }
@@ -795,13 +882,14 @@ main,
   background: #6f6c65;
 }
 .bar--after {
-  width: var(--w);
+  width: 100%;
   background: var(--accent);
-  transition: width 1.4s var(--ease) 0.4s;
+  clip-path: inset(0 calc(100% - var(--w)) 0 0);
+  transition: clip-path 1.4s var(--ease) 0.4s;
 }
 /* 表示前は「導入前」と同じ長さ → 表示時に縮む */
 .js .reveal:not(.is-in) .bar--after {
-  width: 100%;
+  clip-path: inset(0);
 }
 .blk {
   flex: 0 0 calc((100% - 24px) / 5);
@@ -820,7 +908,7 @@ main,
   margin-top: clamp(56px, 9vh, 96px);
 }
 .ai__uses h3 {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: #b9b5aa;
   padding-bottom: 12px;
@@ -829,7 +917,7 @@ main,
 .ai__uses > ul:first-of-type li {
   padding: 14px 0;
   border-bottom: 1px solid #3a3935;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* ---------- Career ---------- */
@@ -844,20 +932,20 @@ main,
 }
 .career__period {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .career h3 {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 700;
 }
 .career__org {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--ink-2);
 }
 .career li div p:last-child {
-  font-size: 14px;
+  font-size: 0.875rem;
   margin-top: 6px;
   max-width: 40em;
 }
@@ -873,18 +961,18 @@ main,
 
 .cert {
   margin-top: 32px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .cert span {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--ink-2);
   margin-right: 24px;
 }
 
 /* ---------- Skills ---------- */
 .subhead {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   padding-bottom: 14px;
   margin-bottom: 36px;
@@ -905,11 +993,11 @@ main,
 .skillset h4 {
   margin: 0 0 8px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .skillset li {
   display: grid;
@@ -918,13 +1006,35 @@ main,
   gap: 6px 16px;
   padding: 14px 0 0;
 }
+.tools {
+  margin-top: 48px;
+}
+.tools h4 {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.tools ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.tools li {
+  font-size: 0.9375rem;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+}
 .skillset__name {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 500;
 }
 .skillset__val {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--ink-2);
 }
 .skillset__track {
@@ -961,15 +1071,16 @@ main,
 }
 .listpage__back {
   display: inline-block;
+  padding-block: 4px;
   margin-bottom: 40px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-decoration: none;
   color: var(--ink-2);
 }
 .listpage__back:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .worklist__item {
   display: grid;
@@ -986,12 +1097,12 @@ main,
 .worklist__period,
 .worklist__cat {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   color: var(--ink-2);
 }
 .worklist__no {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .worklist__main {
   grid-column: 1 / -1;
@@ -1000,7 +1111,7 @@ main,
 .worklist__title {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: clamp(20px, 2.4vw, 28px);
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
   line-height: 1.6;
   letter-spacing: 0.06em;
 }
@@ -1012,7 +1123,7 @@ main,
 }
 .worklist__role {
   margin-top: 12px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ink-2);
 }
 .worklist__block {
@@ -1020,22 +1131,22 @@ main,
   grid-template-columns: 3em 1fr;
   gap: 8px;
   margin-top: 12px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .worklist__block dt {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 2.2;
   color: var(--ink-2);
 }
 .worklist__outcomes {
   margin-top: 12px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ink-2);
 }
 .worklist__outcomes li::before {
   content: '— ';
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .worklist__thumb {
   grid-column: 1 / -1;
@@ -1076,7 +1187,7 @@ main,
   gap: 16px;
   margin-top: clamp(40px, 7vh, 72px);
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .pager__list {
   display: flex;
@@ -1094,7 +1205,7 @@ main,
 }
 a.pager__num:hover,
 a.pager__link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   border-color: var(--accent);
 }
 .pager__num.is-current {
@@ -1118,20 +1229,45 @@ a.pager__link:hover {
 }
 .footer__copy {
   font-family: var(--serif);
-  font-size: clamp(20px, 3vw, 36px);
+  font-size: clamp(1.25rem, 3vw, 2.25rem);
   letter-spacing: 0.1em;
 }
 .footer__small {
   margin-top: 40px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 0.75rem;
   color: var(--ink-2);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+/* ハイコントラスト（強制カラー）でも図が消えないようにシステムカラーで塗る */
+@media (forced-colors: active) {
+  .bar,
+  .blk,
+  .rail__fill,
+  .skillset__fill,
+  .hero__runner {
+    forced-color-adjust: none;
   }
+  .bar--before,
+  .blk {
+    background: GrayText;
+  }
+  .blk--maybe {
+    background: transparent;
+    border-color: GrayText;
+  }
+  .bar--after,
+  .blk--after,
+  .rail__fill {
+    background: Highlight;
+  }
+  .skillset__fill,
+  .hero__runner {
+    background: CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
   .js .reveal {
     opacity: 1;
     transform: none;

@@ -30,7 +30,7 @@ const title = page.currentPage === 1 ? '実績一覧 | 福田 祥広' : `実績�
   <main id="main" class="listpage">
     <header class="listpage__head">
       <a class="listpage__back" href="/#works"><span aria-hidden="true">← </span>トップへ戻る</a>
-      <p class="section__no">Works — {total} projects</p>
+      <p class="section__no" lang="en">Works — {total} projects</p>
       <h1 class="section__title">実績一覧</h1>
       <p class="section__lead">担当した案件の一覧です。</p>
     </header>
@@ -75,7 +75,7 @@ const title = page.currentPage === 1 ? '実績一覧 | 福田 祥広' : `実績�
                 {d.stack.length > 0 && <ul class="tags">{d.stack.map((s) => <li>{s}</li>)}</ul>}
                 {d.url && (
                   <a class="work__link" href={d.url} target="_blank" rel="noopener noreferrer">
-                    サイトを見る<span aria-hidden="true"> ↗</span>
+                    <span class="visually-hidden">{d.title}の</span>サイトを見る<span class="visually-hidden">（新しいタブで開く）</span><span aria-hidden="true"> ↗</span>
                   </a>
                 )}
               </div>
@@ -107,6 +107,6 @@ const title = page.currentPage === 1 ? '実績一覧 | 福田 祥広' : `実績�
   </main>
 
   <footer class="footer">
-    <p class="footer__small">© {new Date().getFullYear()} Yoshihiro Fukuda</p>
+    <p class="footer__small" lang="en">© {new Date().getFullYear()} Yoshihiro Fukuda</p>
   </footer>
 </Base>

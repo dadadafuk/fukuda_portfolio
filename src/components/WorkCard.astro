@@ -91,7 +91,7 @@ const no = String(index + 1).padStart(2, '0');
     {
       d.url && (
         <a class="work__link" href={d.url} target="_blank" rel="noopener noreferrer">
-          サイトを見る<span aria-hidden="true"> ↗</span>
+          <span class="visually-hidden">{d.title}の</span>サイトを見る<span class="visually-hidden">（新しいタブで開く）</span><span aria-hidden="true"> ↗</span>
         </a>
       )
     }
