@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="ページが見つかりません | 福田 祥広" description="お探しのページは見つかりませんでした。">
+  <main id="main" class="notfound">
+    <p class="section__no" lang="en">404 — Not Found</p>
+    <!-- 途中で途切れた線 -->
+    <svg class="notfound__art" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M -5 70 C 5 70, 10 40, 20 40 S 32 62, 40 60" />
+      <path class="is-gap" d="M 40 60 C 46 58, 52 44, 60 42" />
+      <path d="M 60 42 C 70 38, 78 66, 88 60 S 100 44, 105 42" />
+    </svg>
+    <h1 class="section__title">線が途切れました。</h1>
+    <p class="section__lead">お探しのページは見つかりませんでした。URL が変わったか、削除された可能性があります。</p>
+    <a class="work__link" href="/">トップへ線をつなぎ直す<span aria-hidden="true"> →</span></a>
+  </main>
+</Base>

@@ -317,6 +317,14 @@ main,
   inset: 12% 0 20%;
   pointer-events: none;
 }
+/* スマホは縦長なので、線の領域を低くして波をなだらかにする */
+@media (max-width: 759px) {
+  .hero__art {
+    inset: 50% 0 auto;
+    height: min(32svh, 76vw);
+    translate: 0 -58%;
+  }
+}
 .hero__art svg {
   position: absolute;
   inset: 0;
@@ -360,8 +368,85 @@ main,
   background: var(--paper);
   border: 2px solid var(--accent);
 }
-.hero__node:last-of-type {
+/* ノードは押せるボタン */
+.hero__node {
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  appearance: none;
+  pointer-events: auto;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
+}
+.hero__node:disabled {
+  cursor: default;
+}
+/* 押しやすいように当たり判定を広げる */
+.hero__node::after {
+  content: '';
+  position: absolute;
+  inset: -16px;
+}
+.hero__node:enabled:hover,
+.hero__node[aria-pressed='true'] {
+  box-shadow: 0 0 0 7px rgb(214 69 43 / 0.2);
+}
+.hero__node[aria-pressed='true'] {
   background: var(--accent);
+}
+/* 押せることを知らせる波紋（左から順に、繰り返し。停止ボタンで止まる） */
+.js .hero__node:enabled::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  opacity: 0;
+  animation: ping 3s ease-out calc(3.2s + var(--i) * 0.3s) infinite;
+}
+.hero.is-paused .hero__node::before {
+  animation: none;
+}
+@keyframes ping {
+  0% {
+    opacity: 0.8;
+    scale: 1;
+  }
+  60%,
+  100% {
+    opacity: 0;
+    scale: 3.2;
+  }
+}
+
+/* ノードを押すと出る一言 */
+.hero__note {
+  position: absolute;
+  z-index: 2;
+  width: max-content;
+  max-width: min(17rem, calc(100% - 24px));
+  padding: 10px 14px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  pointer-events: none;
+}
+.hero__note[hidden] {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero__note {
+    animation: note-in 0.4s var(--ease);
+  }
+}
+@keyframes note-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
 }
 .hero__node-no,
 .hero__node-ja {
@@ -1222,6 +1307,37 @@ a.pager__link:hover {
   visibility: hidden;
 }
 
+/* ---------- 404 ---------- */
+.notfound {
+  margin-left: 0; /* このページには左のレールがない */
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  gap: 32px;
+  padding: clamp(32px, 6vh, 64px) var(--gutter);
+}
+.notfound__art {
+  width: 100%;
+  height: clamp(120px, 26vh, 220px);
+  overflow: visible;
+}
+.notfound__art path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.notfound__art .is-gap {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+}
+.notfound .work__link {
+  justify-self: start;
+  margin-top: 0;
+}
+
 /* ---------- Footer ---------- */
 .footer {
   padding: clamp(64px, 12vh, 120px) var(--gutter) 40px;
@@ -1281,7 +1397,8 @@ a.pager__link:hover {
     transform: none;
   }
   .js .hero__draw,
-  .js .hero__node {
+  .js .hero__node,
+  .js .hero__node:enabled::before {
     animation: none;
   }
   .hero__runner {

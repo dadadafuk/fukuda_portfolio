@@ -16,16 +16,18 @@ const sections = [
   { id: 'career', no: '05', label: 'Career' },
 ];
 
-// FVの線（viewBox 0–100）。各ノードの座標を水平に通過する
+// FVの線（viewBox 0–100）。ノードはすべて山か谷の頂点に置き、水平に通過する
+// （坂の途中に水平な点をつくると線が歪んで見えるので、01 も谷にしている）
+// note: ノードを押したときに出る一言
 const heroNodes = [
-  { x: 12, y: 64, ja: '設計' },
-  { x: 31, y: 36, ja: '実装' },
-  { x: 50, y: 60, ja: '構築' },
-  { x: 69, y: 30, ja: '公開' },
-  { x: 88, y: 52, ja: '運用' },
+  { x: 12, y: 64, ja: '設計', note: '公開後に更新する人のことまで考えて、ページとCMSの形を決めます。' },
+  { x: 31, y: 36, ja: '実装', note: 'アニメーションは企画から。動きひとつで伝わり方が変わります。' },
+  { x: 50, y: 60, ja: '構築', note: '「どこを触ればいいか」で迷わない管理画面を目指しています。' },
+  { x: 69, y: 30, ja: '公開', note: 'マニュアルを用意して、説明してから公開。ここがゴールではありません。' },
+  { x: 88, y: 52, ja: '運用', note: '公開してからが本番。更新と改善を続けて、サイトを育てます。' },
 ];
 const heroPath =
-  'M -5 74 C 2 74, 6 64, 12 64 S 24 36, 31 36 S 43 60, 50 60 S 62 30, 69 30 S 81 52, 88 52 S 100 40, 105 36';
+  'M -5 50 C 1 50, 5 64, 12 64 S 24 36, 31 36 S 43 60, 50 60 S 62 30, 69 30 S 81 52, 88 52 S 100 40, 105 36';
 
 const aboutStats = [
   { label: 'Web制作の経験', prefix: '', value: 5, unit: '年以上' },
@@ -202,22 +204,36 @@ const fmtMonths = (m: number) => {
       </div>
 
       <!-- 一本の線：設計から運用までを通る -->
-      <div class="hero__art" aria-hidden="true">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+      <div class="hero__art">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           {[-14, -7, 7, 14].map((y) => <path class="hero__ghost" d={heroPath} transform={`translate(0 ${y})`} />)}
         </svg>
-        <svg class="hero__draw" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <svg class="hero__draw" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <path class="hero__stroke" d={heroPath} data-hero-path></path>
         </svg>
-        {
-          heroNodes.map((n, i) => (
-            <span class:list={['hero__node', n.y < 45 && 'is-above']} style={`left:${n.x}%;top:${n.y}%;--i:${i}`}>
-              <span class="hero__node-no">0{i + 1}</span>
-              <span class="hero__node-ja">{n.ja}</span>
-            </span>
-          ))
-        }
-        <span class="hero__runner" data-hero-runner></span>
+        <!-- 工程のノード：押すと点が駆けつけて、一言が出る（JS が動くまでは disabled） -->
+        <div role="group" aria-label="工程（押すと一言が出ます）">
+          {
+            heroNodes.map((n, i) => (
+              <button
+                type="button"
+                class:list={['hero__node', n.y < 45 && 'is-above']}
+                style={`left:${n.x}%;top:${n.y}%;--i:${i}`}
+                data-hero-node
+                data-x={n.x}
+                data-note={n.note}
+                aria-pressed="false"
+                disabled
+              >
+                <span class="hero__node-no">0{i + 1}</span>
+                <span class="hero__node-ja">{n.ja}</span>
+              </button>
+            ))
+          }
+        </div>
+        <span class="hero__runner" data-hero-runner aria-hidden="true"></span>
+        <p class="hero__note" data-hero-note aria-hidden="true" hidden></p>
+        <p class="visually-hidden" role="status" data-hero-live></p>
       </div>
 
       <div class="hero__foot">
@@ -480,6 +496,7 @@ const fmtMonths = (m: number) => {
     const heroPath = document.querySelector<SVGPathElement>('[data-hero-path]');
     const runner = document.querySelector<HTMLElement>('[data-hero-runner]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]');
+    let dashTo: ((len: number) => void) | null = null; // ノードを押したとき、点をその位置へ走らせる
     if (hero && heroPath && runner && !reduce) {
       const total = heroPath.getTotalLength();
       const dur = 14000;
@@ -488,23 +505,50 @@ const fmtMonths = (m: number) => {
       let raf = 0;
       let playing = true;
       let visible = true;
+      let curLen = 0;
+      let dash: { from: number; to: number; start: number } | null = null;
+      let holdUntil = 0;
 
+      const place = (len: number) => {
+        curLen = len;
+        const pt = heroPath.getPointAtLength(len);
+        runner.style.left = `${pt.x}%`;
+        runner.style.top = `${pt.y}%`;
+        runner.classList.add('is-on');
+      };
       const frame = (now: number) => {
-        elapsed += now - last;
+        const dt = now - last;
         last = now;
-        if (elapsed >= 0) {
-          const pt = heroPath.getPointAtLength(((elapsed % dur) / dur) * total);
-          runner.style.left = `${pt.x}%`;
-          runner.style.top = `${pt.y}%`;
-          runner.classList.add('is-on');
+        if (dash) {
+          // ノードへ駆けつける
+          const p = Math.min((now - dash.start) / 700, 1);
+          place(dash.from + (dash.to - dash.from) * (1 - Math.pow(1 - p, 3)));
+          if (p >= 1) {
+            elapsed = (dash.to / total) * dur;
+            holdUntil = now + 1800; // 着いたら少し止まる
+            dash = null;
+          }
+        } else if (now >= holdUntil) {
+          elapsed += dt;
+          if (elapsed >= 0) place(((elapsed % dur) / dur) * total);
         }
         raf = requestAnimationFrame(frame);
       };
+      const running = () => playing && visible && !document.hidden;
       const sync = () => {
         cancelAnimationFrame(raf);
-        if (playing && visible && !document.hidden) {
+        if (running()) {
           last = performance.now();
           raf = requestAnimationFrame(frame);
+        }
+      };
+      dashTo = (len) => {
+        if (running()) {
+          dash = { from: curLen, to: len, start: performance.now() };
+        } else {
+          // 停止中は動かさず、その位置に置くだけ
+          elapsed = (len / total) * dur;
+          place(len);
         }
       };
 
@@ -518,12 +562,72 @@ const fmtMonths = (m: number) => {
         toggle.hidden = false;
         toggle.addEventListener('click', () => {
           playing = !playing;
+          hero.classList.toggle('is-paused', !playing); // ノードの波紋も止める
           toggle.textContent = playing ? 'アニメーションを停止' : 'アニメーションを再生';
           sync();
         });
       }
       sync();
     }
+
+    // FV：ノードを押すと一言が出る
+    const nodes = [...document.querySelectorAll<HTMLButtonElement>('[data-hero-node]')];
+    const note = document.querySelector<HTMLElement>('[data-hero-note]');
+    const live = document.querySelector<HTMLElement>('[data-hero-live]');
+    if (heroPath && note && live) {
+      // 曲線は左から右へ進むので、x 座標から線上の位置を二分探索で求める
+      const lengthAtX = (x: number) => {
+        let lo = 0;
+        let hi = heroPath.getTotalLength();
+        for (let i = 0; i < 24; i++) {
+          const mid = (lo + hi) / 2;
+          if (heroPath.getPointAtLength(mid).x < x) lo = mid;
+          else hi = mid;
+        }
+        return (lo + hi) / 2;
+      };
+      const SHOW_MS = 5000; // 一言を出しておく時間
+      let timer = 0;
+      const close = () => {
+        clearTimeout(timer);
+        nodes.forEach((n) => n.setAttribute('aria-pressed', 'false'));
+        note.hidden = true;
+        live.textContent = '';
+      };
+      const open = (btn: HTMLButtonElement) => {
+        nodes.forEach((n) => n.setAttribute('aria-pressed', String(n === btn)));
+        const text = btn.dataset.note ?? '';
+        note.textContent = text;
+        note.hidden = false;
+        // ノードの上下（ラベルの反対側）に出し、左右は画面内に収める
+        const box = note.offsetParent as HTMLElement;
+        const cx = btn.offsetLeft + btn.offsetWidth / 2;
+        const cy = btn.offsetTop + btn.offsetHeight / 2;
+        const left = Math.min(Math.max(cx - note.offsetWidth / 2, 12), box.clientWidth - note.offsetWidth - 12);
+        const top = btn.classList.contains('is-above') ? cy + 24 : cy - 24 - note.offsetHeight;
+        note.style.left = `${left}px`;
+        note.style.top = `${top}px`;
+        live.textContent = `${btn.querySelector('.hero__node-ja')?.textContent}：${text}`;
+        dashTo?.(lengthAtX(Number(btn.dataset.x)));
+        // 少ししたら自動で閉じる
+        clearTimeout(timer);
+        timer = window.setTimeout(close, SHOW_MS);
+      };
+      nodes.forEach((btn) => {
+        btn.disabled = false;
+        btn.addEventListener('click', () => (btn.getAttribute('aria-pressed') === 'true' ? close() : open(btn)));
+      });
+      document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
+      window.addEventListener('resize', close);
+    }
+
+    // ソースを見に来てくれた人へ
+    console.log(
+      '%c ─────╮      ╭────╮      ╭──●\n      ╰──────╯    ╰──────╯\n%c設計から運用まで、一本の線でつなぐ。\n%cソースを見てくれてありがとうございます。このサイトは Astro でつくっています。',
+      'color:#d6452b;font-family:monospace;line-height:1.2',
+      'font-family:serif;font-size:14px;line-height:2.4',
+      'color:#55534d',
+    );
 
     // 進捗ライン：CSS の scroll-driven animation に非対応のブラウザだけ JS で更新
     if (!CSS.supports('animation-timeline: scroll()')) {
