@@ -3,12 +3,15 @@ title: シーサイドホテル舞子ビラ神戸
 category: ホテル公式サイト
 start: '2025-05'
 end: '2025-07'
-order: 9
+order: 10
 role: エンジニア
 team: 5名体制
 stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
+  - GSAP
+  - Lenis
+  - WPML（多言語）
 tasks:
   - コーディング
   - アニメーションの企画・実装

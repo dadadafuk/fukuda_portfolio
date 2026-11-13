@@ -1,7 +1,7 @@
 ---
 title: 福屋ホールディングス
 category: コーポレートサイト
-order: 5
+order: 6
 role: エンジニア
 team: 3名体制
 stack:

@@ -8,6 +8,7 @@ stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
   - GSAP
+  - Lenis
 tasks:
   - コーディング
   - アニメーションの企画・実装

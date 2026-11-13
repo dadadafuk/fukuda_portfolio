@@ -8,6 +8,7 @@ role: エンジニア
 team: 4名体制
 stack:
   - HTML / CSS / JavaScript
+  - GSAP
 tasks:
   - コーディング
   - アニメーションの企画・実装

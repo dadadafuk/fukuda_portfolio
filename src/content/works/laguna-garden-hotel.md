@@ -3,12 +3,15 @@ title: ラグナガーデンホテル
 category: ホテル公式サイト
 start: '2025-10'
 end: '2026-04'
-order: 8
+order: 9
 role: エンジニア
 team: 5名体制
 stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
+  - GSAP
+  - Tailwind CSS
+  - WPML（多言語）
 tasks:
   - コーディング
   - アニメーションの企画・実装

@@ -10,6 +10,7 @@ stack:
   - SCSS / CSS
   - JavaScript
   - PHP（WordPress）
+  - GSAP
   - Vercel
 tasks:
   - コーディング

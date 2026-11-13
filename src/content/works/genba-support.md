@@ -9,6 +9,8 @@ team: 4名体制
 stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
+  - GSAP
+  - Tailwind CSS
   - Claude Code
 tasks:
   - コーディング

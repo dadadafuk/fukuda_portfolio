@@ -1,7 +1,7 @@
 ---
 title: '福屋HD | 採用サイト'
 category: 採用サイト
-order: 6
+order: 7
 role: エンジニア
 team: 3名体制
 stack:

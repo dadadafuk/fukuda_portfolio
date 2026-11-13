@@ -10,6 +10,7 @@ stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
   - GSAP
+  - Lottie
 tasks:
   - WordPress構築
   - 管理画面の設計

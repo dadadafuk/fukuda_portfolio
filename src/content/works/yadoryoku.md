@@ -3,12 +3,14 @@ title: 宿力
 category: コーポレートサイト
 start: '2025-04'
 end: '2025-08'
-order: 10
+order: 11
 role: エンジニア
 team: 6名体制
 stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
+  - GSAP
+  - Lottie
 tasks:
   - コーディング
   - アニメーションの企画・実装

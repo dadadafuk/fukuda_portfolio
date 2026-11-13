@@ -12,6 +12,8 @@ stack:
   - SCSS / CSS
   - JavaScript
   - PHP（WordPress）
+  - GSAP
+  - Tailwind CSS
   - Vercel
 tasks:
   - コーディング

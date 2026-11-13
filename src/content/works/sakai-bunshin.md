@@ -1,13 +1,14 @@
 ---
 title: 堺市文化振興財団
 category: 財団サイト
-order: 11
+order: 12
 role: エンジニア
 team: 5名体制
 stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
   - GSAP
+  - Tailwind CSS
   - Vue.js
 tasks:
   - コーディング

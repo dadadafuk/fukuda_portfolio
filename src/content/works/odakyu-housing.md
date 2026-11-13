@@ -1,13 +1,14 @@
 ---
 title: 小田急ハウジング
 category: コーポレートサイト
-order: 7
+order: 8
 role: エンジニア
 team: 6名体制
 stack:
   - HTML / CSS / JavaScript
   - WordPress（PHP）
   - GSAP
+  - Vue.js
 tasks:
   - コーディング
   - アニメーションの企画・実装
